@@ -38,14 +38,14 @@ export function buildWhereClause(query) {
   };
 }
 
-export function getUsers(searchQuery) {
+export function getUsers(searchQuery, limit, offset=0) {
   return new Promise((resolve, reject) => {
     const { where, params } = buildWhereClause(searchQuery);
 
     db.all(
-      `SELECT * FROM users ${where} ORDER BY createdAt DESC`,
+      `SELECT * FROM users ${where} ORDER BY createdAt DESC LIMIT ${limit}`,
       params,
-      (err, rows) => (err ? reject(err) : resolve(rows))
+      (err, rows) => (err ? reject(err) : resolve(rows.slice(offset, offset + limit)))
     );
   });
 }
@@ -72,7 +72,7 @@ export function createMessage({ subject, body, userIds }) {
         if (err) return rej(err);
 
         const stmt = db.prepare(
-          "INSERT INTO message_users (message_id, user_id) VALUES (?, ?)"
+          "INSERT INTO user_message (message_id, user_id) VALUES (?, ?)"
         );
         userIds.forEach(uid => stmt.run(this.lastID, uid));
         stmt.finalize();

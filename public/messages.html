@@ -2,7 +2,7 @@
 <html>
 <head>
   <title>Messages</title>
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
+  <link rel="stylesheet" href="/css/jquery.dataTables.min.css">
 </head>
 <body>
 
@@ -10,15 +10,19 @@
 
 <table id="messages"></table>
 
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+<script src="/js/jquery-3.7.1.min.js"></script>
+<script src="/js/jquery.dataTables.min.js"></script>
 <script>
 $(async function () {
   const table = $("#messages").DataTable({
     ajax: { url: "/api/messages", dataSrc: "" },
     columns: [
+      { title: "ID", data: "id" },
+      { title: "FetLife ID", data: "message_id" },
       { title: "Subject", data: "subject" },
-      { title: "Created", data: "dateCreated" },
+      { title: "Body", data: "body" },
+      { title: "Date Created", data: "dateCreated" },
+      { title: "Users", data: "" },
       {
         title: "Actions",
         data: "id",

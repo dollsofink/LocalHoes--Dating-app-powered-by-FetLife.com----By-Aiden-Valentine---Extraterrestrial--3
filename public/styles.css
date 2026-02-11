@@ -1,14 +1,41 @@
 body { font-family: sans-serif; padding: 20px; }
-#grid { display: flex; flex-wrap: wrap; gap: 10px; }
-.card {
-  width: 120px;
+
+#grid { display: flex; flex-wrap: wrap; gap: 0px; }
+#grid.gap { display: flex; flex-wrap: wrap; gap: 10px; }
+
+.card.lg {
+  width: 150px;
   border: 1px solid #ccc;
-  padding: 5px;
+  padding: 0px;
   text-align: center;
 }
-.card img {
+
+.card.sm {
+  width: 100px;
+  border: 1px solid #ccc;
+  padding: 0px;
+  text-align: center;
+}
+
+.card.sm img {
   width: 100px;
   height: 100px;
   object-fit: cover;
 }
+
+.card.lg img {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+}
+
+.card p {
+	margin: 0;
+	font-size: 12px;
+}
+
 .hidden-text p { display: none; }
+
+#search {
+	margin-bottom: 10px;
+}

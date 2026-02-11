@@ -1,0 +1,31 @@
+const createTableSql = `
+	CREATE TABLE IF NOT EXISTS users (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		user_id INTEGER NULL,
+		user TEXT NOT NULL UNIQUE,
+		age INTEGER NOT NULL,
+		role TEXT NULL,
+		gender TEXT NULL,
+		city TEXT NULL,
+		state TEXT NULL,
+		email TEXT NULL,
+		phone TEXT NULL,
+		website TEXT NULL,
+		isSexy INTEGER NULL,
+		followers INTEGER NOT NULL DEFAULT 0,
+		following INTEGER NOT NULL DEFAULT 0,
+		isFollowing INTEGER NOT NULL DEFAULT 0,
+		isFollowingBack INTEGER NOT NULL DEFAULT 0,
+		isFriend INTEGER NOT NULL DEFAULT 0,
+		messageCount INTEGER NOT NULL DEFAULT 0,
+		picturesCount INTEGER NOT NULL DEFAULT 0,
+		videosCount INTEGER NOT NULL DEFAULT 0,
+		postsCount INTEGER NOT NULL DEFAULT 0,
+		lastOnline TEXT NULL DEFAULT CURRENT_TIMESTAMP,
+		createdAt TEXT NULL DEFAULT CURRENT_TIMESTAMP
+	);
+`;
+
+export {
+	createTableSql: createTableSql
+}

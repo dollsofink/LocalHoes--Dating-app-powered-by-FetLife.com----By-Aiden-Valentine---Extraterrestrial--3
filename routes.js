@@ -13,9 +13,23 @@ import { getCsrfToken } from "./csrf-token.mjs";
 
 const router = express.Router();
 
+/*
+ * Middleware - Log all requests to console
+ */
+router.use((req, res, next) => {
+	// Skip common requests
+	if (req.path.includes(".well-known")) {
+		return
+	}
+	const timestamp = new Date(Date.now()).toISOString().replace(/[TZ]/g, " ").replace(/\..*/g, " ").trim()
+	console.log(`${timestamp} | ${req.method} ${req.path}`)
+	next()
+})
+
 router.get("/api/users", async (req, res) => {
   try {
-    const users = await getUsers(req.query.q);
+	const limit = req.query.limit || 25
+	const users = await getUsers(req.query.q, limit, req.query.offset || 0);
     res.json(users);
   } catch (e) {
     res.status(500).json({ error: e.message });
@@ -80,13 +94,13 @@ router.post("/api/messages/:id/send", async (req, res) => {
 router.post("/api/messages/:id/send", async (req, res) => {
   const priority = Number(req.body.priority || 0);
   await enqueueMessage(req.params.id, priority);
-  try {
-    // const intel = await api.get("intel"); // uses endpoint defaults
-    // res.json({ intel });
-	res.json({ queued: true });
-  } catch (e) {
-    res.status(502).json({ error: e?.message ?? "Message failed to send." });
-  }
+  // try {
+    // // const intel = await api.get("intel"); // uses endpoint defaults
+    // // res.json({ intel });
+	// res.json({ queued: true });
+  // } catch (e) {
+    // res.status(502).json({ error: e?.message ?? "Message failed to send." });
+  // }
 });
 
 /*
