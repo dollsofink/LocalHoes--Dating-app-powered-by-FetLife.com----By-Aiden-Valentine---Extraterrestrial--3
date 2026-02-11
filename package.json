@@ -1,7 +1,7 @@
 {
-  "name": "FetLife",
+  "name": "LocalHoes: Dating app powered by FetLife. By Aiden Valentine <3",
   "version": "1.0.0",
-  "description": "This is a hack for FetLife to all an API to their site. So we can power tools like Bulk Follow/Unfollow, Bulk Messaging. And features a search engine to search/sort users -- one much more powerful than their on-sie tool.",
+  "description": "This is a dating app for FetLife users. For singles, poly couples, professional photographers and models to build their network. Features a REST API. So we can power tools like Bulk Follow/Unfollow, Bulk Messaging. And features a search engine to search/sort users -- one much more powerful than their on-site tool.",
   "license": "All Rights Reserved",
   "author": "Alex Corsmeier <dollsofink@gmail.com>",
   "type": "module",
