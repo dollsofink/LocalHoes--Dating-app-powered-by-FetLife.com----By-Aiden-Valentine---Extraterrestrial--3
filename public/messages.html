@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Messages</title>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
+</head>
+<body>
+
+<a href="/messages/new">➕ New Message</a>
+
+<table id="messages"></table>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+<script>
+$(async function () {
+  const table = $("#messages").DataTable({
+    ajax: { url: "/api/messages", dataSrc: "" },
+    columns: [
+      { title: "Subject", data: "subject" },
+      { title: "Created", data: "dateCreated" },
+      {
+        title: "Actions",
+        data: "id",
+        render: id => `
+          <button onclick="send(${id})">Send</button>
+          <button onclick="archive(${id})">Archive</button>
+          <button onclick="del(${id})">Delete</button>
+        `
+      }
+    ]
+  });
+
+  window.archive = id =>
+    fetch(`/api/messages/${id}/archive`, { method: "POST" })
+      .then(() => table.ajax.reload());
+
+  window.del = id =>
+    fetch(`/api/messages/${id}`, { method: "DELETE" })
+      .then(() => table.ajax.reload());
+
+  window.send = id =>
+    fetch(`/api/messages/${id}/send`, { method: "POST" });
+});
+</script>
+</body>
+</html>

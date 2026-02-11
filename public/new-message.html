@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head><title>New Message</title></head>
+<body>
+
+<form id="msg">
+  <input name="subject" placeholder="Subject" required><br>
+  <textarea name="body" placeholder="Message body" rows="6"></textarea><br>
+
+  <h4>Tag Users (max 10)</h4>
+  <select id="users" multiple size="10"></select><br>
+
+  <button>Create Message</button>
+</form>
+
+<script>
+(async function () {
+  const users = await fetch("/api/users").then(r => r.json());
+  const sel = document.getElementById("users");
+
+  users.forEach(u => {
+    const o = document.createElement("option");
+    o.value = u.id;
+    o.textContent = u.user;
+    sel.appendChild(o);
+  });
+
+  document.getElementById("msg").onsubmit = async e => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+
+    const userIds = [...sel.selectedOptions]
+      .slice(0, 10)
+      .map(o => Number(o.value));
+
+    await fetch("/api/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        subject: fd.get("subject"),
+        body: fd.get("body"),
+        userIds
+      })
+    });
+
+    location.href = "/messages";
+  };
+})();
+</script>
+
+</body>
+</html>

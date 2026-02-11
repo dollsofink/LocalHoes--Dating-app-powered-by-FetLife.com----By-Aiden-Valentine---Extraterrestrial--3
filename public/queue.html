@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Message Queue</title>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
+</head>
+<body>
+
+<h2>Message Queue</h2>
+
+<table id="queue"></table>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+<script>
+$(function () {
+  const table = $("#queue").DataTable({
+    ajax: { url: "/api/queue", dataSrc: "" },
+    columns: [
+      { title: "Subject", data: "subject" },
+      { title: "Priority", data: "priority" },
+      { title: "Attempts", data: "attempts" },
+      { title: "Last Attempt", data: "lastAttempt" },
+      {
+        title: "Actions",
+        data: "id",
+        render: id => `
+          <button onclick="del(${id})">Delete</button>
+        `
+      }
+    ]
+  });
+
+  window.del = id =>
+    fetch(`/api/queue/${id}`, { method: "DELETE" })
+      .then(() => table.ajax.reload());
+});
+</script>
+</body>
+</html>

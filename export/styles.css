@@ -1,0 +1,14 @@
+body { font-family: sans-serif; padding: 20px; }
+#grid { display: flex; flex-wrap: wrap; gap: 10px; }
+.card {
+  width: 120px;
+  border: 1px solid #ccc;
+  padding: 5px;
+  text-align: center;
+}
+.card img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+}
+.hidden-text p { display: none; }
