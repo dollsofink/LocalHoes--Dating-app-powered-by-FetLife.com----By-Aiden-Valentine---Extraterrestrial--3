@@ -1,32 +1,36 @@
 /* FAMILIES */
  
-import express from "express";
+import express from "express"
 import expressLayouts from "express-ejs-layouts"
-import AppDAO from '../db/database.js'
-import FamilyController from '../controllers/familyController.js'
-import { listFamilies, getFamily, createFamily, updateFamily, addUserToFamily } from "../db.js"
-import { getCsrfToken } from "../csrf-token.mjs";
 
-const router = express.Router();
+const router = express.Router()
 
-const dao = new AppDAO('../database.sqlite');
-console.log(dao)
-const familyController = new FamilyController(dao);
-console.log(familyController)
+export default function familiesRouter(familyController) {
+  const router = express.Router()
 
-router.get("/api/family/:name", async (req, res) => {
-  var response = await familyController.getFamily(req.params.name)
-  res.json(response)
-});
+  router.get("/api/family/:name", async (req, res) => {
+    const response = await familyController.getFamilyByName(req.params.name);
+    res.json(response)
+  })
 
-router.post("/api/family", async (req, res) => {
-  var response = await familyController.createFamily(req.body)
-  res.json(response)
-});
+  router.get("/api/family", async (req, res) => {
+    const response = await familyController.getFamilies()
+    res.json(response)
+  })
 
-router.post("/api/family/:name/:user", async (req, res) => {
-  var response = await familyController.addUserToFamily(req.params.name, req.params.user)
-  res.json(response)
-});
+  router.post("/api/family", async (req, res) => {
+    const response = await familyController.createFamily(req.body)
+    res.json(response)
+  })
 
-export default router
+  router.post("/api/family/:familyId/:userId", async (req, res) => {
+    const response = await familyController.addUserToFamily({
+      familyId: req.params.familyId,
+      userId: req.params.userId,
+    })
+
+    res.json(response)
+  })
+
+  return router
+}

@@ -4,14 +4,40 @@ import path from "path"
 import vhost from "vhost"
 import livereload from "livereload"
 import connectLivereload from "connect-livereload"
-import AppDAO from './db/database.js'
-import router from "./routes/index.js"
+import AppDAO from './db/database.js';
+import FamilyController from './controllers/familyController.js';
+import UserController from './controllers/userController.js';
+import MessageController from './controllers/messageController.js';
+import createRouter from "./routes/index.js";
+// import router from "./routes/index.js"
 import cors from "cors"
 
 const app = express()
 const adminApp = express() // TODO -- this is to show vhost capability
 const PORT = 6969
 const dao = new AppDAO('./database.sqlite');
+
+/* HELPERS */
+function getAllMethods(obj) {
+    const methods = new Set();
+    let current = obj;
+    // Traverse the prototype chain until the top (Object.prototype) is reached
+    while (current !== Object.prototype) {
+        // Get all property names defined directly on the current object/prototype
+        const props = Object.getOwnPropertyNames(current);
+        
+        for (const prop of props) {
+            // Check if the property is a function and not the 'constructor'
+            if (typeof current[prop] === 'function' && prop !== 'constructor') {
+                methods.add(prop);
+            }
+        }
+        // Move up the prototype chain
+        current = Object.getPrototypeOf(current);
+    }
+    return Array.from(methods);
+}
+
 
 // Only use livereload in development
 if (process.env.NODE_ENV === 'development') {
@@ -41,7 +67,7 @@ app.use(express.urlencoded({ extended: true }))
 // Use vhost middleware to route requests
 app.use(vhost('admin.localhoes.org', adminApp))
 app.use(vhost('fetlife.localhoes.org', adminApp))
-app.use(router)
+// app.use(router)
 
 if (process.argv[2] === "export") {
   await fs.remove("./export")
@@ -60,6 +86,18 @@ app.listen(PORT, () =>
 async function bootstrap() {
   try {
     await dao.connect();
+
+    const controllers = {
+      familyController: new FamilyController(dao),
+      userController: new UserController(dao),
+      messageController: new MessageController(dao),
+    };
+	
+	console.log(getAllMethods(controllers.familyController))
+	console.log(getAllMethods(controllers.userController))
+	console.log(getAllMethods(controllers.messageController))
+
+    app.use(createRouter(controllers));
 
     app.listen(PORT, () => {
       console.log(`Server running on http://localhost:${PORT}`);
