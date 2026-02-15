@@ -12,7 +12,7 @@ import {
 import { enqueueMessage } from "./db.js";
 import { listQueue, removeQueueItem } from "./db.js";
 import { getCsrfToken } from "./csrf-token.mjs";
-import { saveThumbnail } from "./fetlife-user.mjs"
+import { getUserInfo, saveThumbnail } from "./fetlife-user.mjs"
 
 const router = express.Router();
 
@@ -155,6 +155,14 @@ router.delete("/api/queue/:id", async (req, res) => {
 /*
  * USERS 
  */
+router.get("/api/users/:user", async (req, res) => {
+  var response = await getUserInfo(req.params.user)
+  res.json(response)
+});
+router.post("/api/users/:user", async (req, res) => {
+  var response = await saveUserInfo(req.body)
+  res.json(response)
+});
 router.post("/api/users/:id/friend", async (req, res) => {
   const id = Number(req.params.id || 0)
   // var response = await addFriend(req.params.id)
