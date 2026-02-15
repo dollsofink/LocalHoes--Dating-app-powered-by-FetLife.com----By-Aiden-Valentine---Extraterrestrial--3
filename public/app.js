@@ -145,6 +145,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       grid.innerHTML = users.map(u => `
         <div class="card lg" data-is-sexy="${u.isSexy}" data-is-following="${u.isFollowing}" data-is-friend="${u.isFriend}">
           <img src="${u.profilePicture || "https://via.placeholder.com/100"}">
+          <img src="${u.profilePicture || "https://placehold.co/100x100"}">
           <p><a href="https://fetlife.com/${u.user}">${u.user}</a></p>
           <p>${u.age} | ${u.role} | ${u.gender}</p>
           <p>${u.city}, ${u.state}</p>
