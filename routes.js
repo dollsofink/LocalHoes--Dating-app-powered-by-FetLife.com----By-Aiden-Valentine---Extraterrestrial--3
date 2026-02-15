@@ -1,4 +1,6 @@
 import express from "express";
+import path from "node:path"
+import expressLayouts from "express-ejs-layouts"
 import { getUsers } from "./db.js";
 import {
   getMessages,
@@ -10,21 +12,36 @@ import {
 import { enqueueMessage } from "./db.js";
 import { listQueue, removeQueueItem } from "./db.js";
 import { getCsrfToken } from "./csrf-token.mjs";
+import { saveThumbnail } from "./fetlife-user.mjs"
 
 const router = express.Router();
+
+// Set EJS as the view engine
+// app.set("view engine", "ejs")
+// Use express-ejs-layouts middleware
+router.use(expressLayouts)
+// app.set('layout', './partials/layout')
+// Set the directory for your views
+// app.set('views', path.join("./", 'views'))
 
 /*
  * Middleware - Log all requests to console
  */
 router.use((req, res, next) => {
 	// Skip common requests
-	if (req.path.includes(".well-known")) {
+	if (req.path.includes(".well-known") || req.path.includes("/js") | req.path.includes("/css")) {
 		return
 	}
 	const timestamp = new Date(Date.now()).toISOString().replace(/[TZ]/g, " ").replace(/\..*/g, " ").trim()
 	console.log(`${timestamp} | ${req.method} ${req.path}`)
 	next()
 })
+
+// Optional: Set a specific layout for the admin panel
+// router.use((req, res, next) => {
+	// req.app.set('layout', 'layout/full-width'); // Assuming 'admin' is in your views folder
+	// next();
+// });
 
 router.get("/api/users", async (req, res) => {
   try {
@@ -36,8 +53,24 @@ router.get("/api/users", async (req, res) => {
   }
 });
 
-router.get("/", (_, res) => res.sendFile("index.html", { root: "public" }));
-router.get("/grid", (_, res) => res.sendFile("grid.html", { root: "public" }));
+router.get('/user', (req, res) => {
+  res.render('users'); // This will use the 'admin' layout
+});
+
+// router.get("/", (_, res) => res.sendFile("index.html", { root: "public" }));
+router.get("/", (_, res) => {
+    res.render("users", {
+		title: "BB's db - It's a SEX CLUB!",
+        motto: "LocalHoes | Dating app powered by FetLife",
+        subtitle: "Dating app powered by FetLife",
+        greeting: "",
+    });
+});
+router.get("/grid", (_, res) => {
+    res.render("users-grid", {
+		title: "BB's db - It's a SEX CLUB!"
+	})
+});
 
 /*
  * UTILITIES 
@@ -143,6 +176,11 @@ router.post("/api/users/:id/follow", async (req, res) => {
 router.post("/api/users/:id/unfollow", async (req, res) => {
   const id = Number(req.params.id || 0)
   // var response = await new User(req.params.id).unfollow()
+  res.json(response)
+});
+
+router.get("/api/users/:user/thumbnail", async (req, res) => {
+  var response = await saveThumbnail(req.params.user)
   res.json(response)
 });
 

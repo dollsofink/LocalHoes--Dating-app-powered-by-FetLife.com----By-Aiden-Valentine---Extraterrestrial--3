@@ -6,8 +6,12 @@ import router from "./routes.js";
 const app = express();
 const PORT = 3000;
 
+// Set EJS as the view engine
+app.set("view engine", "ejs")
+app.set('layout', 'layout/full-width')
 app.use(express.json());
 app.use(express.static("public"));
+app.use(express.urlencoded({ extended: true }))
 app.use(router);
 
 if (process.argv[2] === "export") {
