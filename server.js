@@ -4,12 +4,14 @@ import path from "path"
 import vhost from "vhost"
 import livereload from "livereload"
 import connectLivereload from "connect-livereload"
-import router from "./routes.js"
+import AppDAO from './db/database.js'
+import router from "./routes/index.js"
 import cors from "cors"
 
 const app = express()
 const adminApp = express() // TODO -- this is to show vhost capability
 const PORT = 6969
+const dao = new AppDAO('./database.sqlite');
 
 // Only use livereload in development
 if (process.env.NODE_ENV === 'development') {
@@ -33,6 +35,7 @@ app.set('layout', 'layout/full-width')
 app.use(cors())
 app.use(express.json())
 app.use(express.static("public"))
+app.use(express.static(path.join("files"))) // Static serve images for Chrome extension
 app.use(express.urlencoded({ extended: true }))
 
 // Use vhost middleware to route requests
@@ -47,9 +50,28 @@ if (process.argv[2] === "export") {
   process.exit(0);
 }
 
+/*
 app.listen(PORT, () =>
   console.log(`🚀 Server running at http://localhost:${PORT}`)
 )
+*/
+
+// Connect to DB and start server
+async function bootstrap() {
+  try {
+    await dao.connect();
+
+    app.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
+
+  } catch (err) {
+    console.error("Startup failed:", err);
+    process.exit(1);
+  }
+}
+
+bootstrap();
 
 export const QUEUE_COOLDOWN_MINUTES = Number(
   process.env.QUEUE_COOLDOWN_MINUTES || 5

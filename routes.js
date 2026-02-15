@@ -12,7 +12,8 @@ import {
 import { enqueueMessage } from "./db.js";
 import { listQueue, removeQueueItem } from "./db.js";
 import { getCsrfToken } from "./csrf-token.mjs";
-import { getUserInfo, saveThumbnail } from "./fetlife-user.mjs"
+import { getUserInfo, saveThumbnail, saveAllThumbnails, followUser, addAsFriend } from "./fetlife-user.mjs"
+import { listFamilies, getFamily, getFamilies, createFamily, updateFamily, addUserToFamily, removeUserFromFamily } from "./db.js"
 
 const router = express.Router();
 
@@ -45,8 +46,9 @@ router.use((req, res, next) => {
 
 router.get("/api/users", async (req, res) => {
   try {
-	const limit = req.query.limit || 25
-	const users = await getUsers(req.query.q, limit, req.query.offset || 0);
+	// const limit = req.query.limit || 9999
+	// const users = await getUsers(req.query.q, limit, req.query.offset || 0);
+	const users = await getUsers(req.query.q)
     res.json(users);
   } catch (e) {
     res.status(500).json({ error: e.message });
@@ -155,41 +157,79 @@ router.delete("/api/queue/:id", async (req, res) => {
 /*
  * USERS 
  */
-router.get("/api/users/:user", async (req, res) => {
-  var response = await getUserInfo(req.params.user)
+router.get("/api/users/:username", async (req, res) => {
+  var response = await getUserInfo(req.params.username)
   res.json(response)
 });
-router.post("/api/users/:user", async (req, res) => {
+router.post("/api/users/:username", async (req, res) => {
   var response = await saveUserInfo(req.body)
   res.json(response)
 });
 router.post("/api/users/:id/friend", async (req, res) => {
   const id = Number(req.params.id || 0)
-  // var response = await addFriend(req.params.id)
+  const csrfToken = await getCsrfToken()
+  var response = await addAsFriend(req.params.id, csrfToken)
   res.json(response)
 });
 
-router.post("/api/users/:id/friend", async (req, res) => {
+router.post("/api/users/:id/unfriend", async (req, res) => {
   const id = Number(req.params.id || 0)
   // var response = await removeFriend(req.params.id)
   res.json(response)
 });
 
-router.post("/api/users/:id/follow", async (req, res) => {
-  const id = Number(req.params.id || 0)
+router.post("/api/users/:username/follow", async (req, res) => {
+  const username = req.params.username
+  const csrfToken = await getCsrfToken()
   // var response = await new User(req.params.id).follow()
+  var response = followUser(req.params.username, csrfToken)
   res.json(response)
 });
 
-router.post("/api/users/:id/unfollow", async (req, res) => {
-  const id = Number(req.params.id || 0)
+router.post("/api/users/:username/unfollow", async (req, res) => {
+  const username = req.params.username
   // var response = await new User(req.params.id).unfollow()
+  // var response = unfollowUser(req.params.username)
   res.json(response)
 });
 
 router.get("/api/users/:user/thumbnail", async (req, res) => {
   var response = await saveThumbnail(req.params.user)
   res.json(response)
+});
+
+/* FAMILIES */
+
+router.get("/api/family/:name", async (req, res) => {
+  var response = await getFamily(req.params.name)
+  res.json(response)
+});
+
+router.post("/api/family/:name", async (req, res) => {
+  var response = await addFamily(req.params.name)
+  res.json(response)
+});
+
+router.post("/api/family/:name/:user", async (req, res) => {
+  var response = await addUserToFamily(req.params.name, req.params.user)
+  res.json(response)
+});
+
+router.post("/api/thumbnails/refresh", async (req, res) => {
+  // try {
+	// const users = await getUsers(req.query.q, limit ?? 9999, req.query.offset || 0)
+	const users = await getUsers(req.query.q)
+	console.log(users)
+	res.json({
+	  "message": "Updating all thumbnails in the db."
+	})
+	// for await (var user of users) {
+		// console.log(`${user.user}`)
+		var response = await saveAllThumbnails(users)
+	// }
+  // } catch (e) {
+    // res.status(500).json({ error: e.message });
+  // }
 });
 
 export default router;
